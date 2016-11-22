@@ -18,7 +18,10 @@ public:
         int PPL;
         int Cargo;
         bool GC;
+        Plane *Left = NULL;
+        Plane *Right = NULL;
     };
+
 
 
 
