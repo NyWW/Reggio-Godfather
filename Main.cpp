@@ -8,41 +8,49 @@
 #include <vector>
 #include <iomanip>
 #include <fstream>
+
 using namespace std;
 
-class Godfather{
+class GodfatherATC{
 public:
+
+    int numberOfPlanes;
+
     struct Plane{
-        char Data;
-        int Fuel;
-        int PPL;
-        int Cargo;
-        bool GC;
-        Plane *Left = NULL;
-        Plane *Right = NULL;
-        int shutup;
+        int fuel;
+        int people;
+        int cargo;
+        int timeToExecute;
+
+        bool grandKid;
+        bool arrOrDep;
+
+
+        Plane *left = NULL;
+        Plane *right = NULL;
     };
 
 
 
 
 private:
-    int RelativeTime;
-    double AvgTOWaitTime;
-    double AvgLDWaitTime;
-    int PlaneCrash;
-    int PlaneDepart;
-    int PlaneArrive;
-    int PPLSafeLanded;
-    int PPLKilled;
-    int GCKilled;
-    double AvgGCArrive;
-    double AvgGCDepart;
-    int SafeCargo;
-    int DestroyedCargo;
-    int TotalTime;
+    int relativeTime;
+    double avgTOWaitTime;
+    double avgLDWaitTime;
+    int planeCrash;
+    int planeDepart;
+    int planeArrive;
+    int peopleSafeLanded;
+    int peopleKilled;
+    int grandKidKilled;
+    double avgGrandKidArrive;
+    double avgGrandKidDepart;
+    int safeCargo;
+    int destroyedCargo;
+    int totalTime;
 
 };
+
 int main(){
 
 
