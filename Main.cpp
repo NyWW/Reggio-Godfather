@@ -20,6 +20,7 @@ public:
         bool GC;
         Plane *Left = NULL;
         Plane *Right = NULL;
+        int shutup;
     };
 
 
