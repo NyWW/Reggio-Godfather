@@ -11,6 +11,11 @@
 
 using namespace std;
 
+const int hoomanValue = 20000;
+const int refuelTime = 10;
+const int maxFuel = 1000;
+
+
 class GodfatherATC{
 public:
     GodfatherATC();
@@ -31,10 +36,13 @@ public:
         int cargo;
         int timeToExecute;
         bool grandKid;
-        Plane *left = NULL;
-        Plane *right = NULL;
+        Plane *nextPlane = NULL;
     };
 
+    struct timeUnit{
+        int timeSpace;
+        Plane *next = NULL;
+    };
 
 
 
@@ -66,22 +74,22 @@ GodfatherATC::GodfatherATC(){
     ptr = NULL;
     last = NULL;
 
-    int numberOfPlanes = 0;
-    int relativeTime = 0;
-    int safeCargo = 0;
-    int destroyedCargo = 0;
-    int totalTime = 0;
-    int planeCrash = 0;
-    int planeDepart = 0;
-    int planeArrive = 0;
-    int peopleSafeLanded = 0;
-    int peopleKilled = 0;
-    int grandKidKilled = 0;
+    numberOfPlanes = 0;
+    relativeTime = 0;
+    safeCargo = 0;
+    destroyedCargo = 0;
+    totalTime = 0;
+    planeCrash = 0;
+    planeDepart = 0;
+    planeArrive = 0;
+    peopleSafeLanded = 0;
+    peopleKilled = 0;
+    grandKidKilled = 0;
 
-    double avgGrandKidArrive = 0;
-    double avgGrandKidDepart = 0;
-    double avgTOWaitTime = 0;
-    double avgLDWaitTime = 0;
+    avgGrandKidArrive = 0;
+    avgGrandKidDepart = 0;
+    avgTOWaitTime = 0;
+    avgLDWaitTime = 0;
 
 }
 void GodfatherATC::takingInput(){
