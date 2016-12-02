@@ -8,6 +8,7 @@
 #include <vector>
 #include <iomanip>
 #include <fstream>
+#include <sstream>
 
 using namespace std;
 
@@ -137,11 +138,21 @@ void GodfatherATC::statistic(){
 
 }
 void GodfatherATC::data(){
-    ptr = head;
+ptr = head;
+    
     while(ptr != NULL){
-        cout << ptr -> inputs << endl;
+        
+         istringstream shit(ptr->inputs);
+         string hole;
+         while(getline(shit, hole, ',')) {
+             cout << hole << endl;
+             
+         }
+        
+        cout << endl;
         ptr = ptr -> next;
     }
+
     return;
 }
 
