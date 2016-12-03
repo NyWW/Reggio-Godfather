@@ -26,6 +26,8 @@ public:
     void sorting();
     void errorLine();
     void checking();
+    bool checkInput(string a);
+    void adding();
 
 
     struct stringArray{
@@ -116,31 +118,49 @@ void GodfatherATC::takingInput(){
     }
     while(!textfile.eof()){
         getline(textfile, sample);
+        bool wrongInput = false;
+        string nospace = "";
+        for(int a = 0; a < sample.size(); a++){ // get rid of all the spaces in the input.
+            if((sample).at(a) != ' '){
+
+                nospace += toupper(((sample).at(a)));
+            }
+        }
+        sample = nospace;
+        nospace = nospace.append(",");
         /*textfile >> sample;
         cout << sample << endl;
         result += sample;
         result.append(" ");
         */
-
-        stringArray *temp = new stringArray;
-
-        temp -> inputs = sample;
-        if(head == NULL){
-            head = temp;
-            ptr = head;
-            last = head;
+        wrongInput = checkInput(nospace);
+        if(wrongInput == false)
+        {
+            stringArray *temp = new stringArray;
+            temp -> inputs = sample;
+            if(head == NULL){
+                head = temp;
+                ptr = head;
+                last = head;
+            }
+            else{
+                last -> next = temp;
+                last  = temp;
+            }
+            temp = NULL;
+            delete temp;
         }
-        else{
-            last -> next = temp;
-            last  = temp;
+        else
+        {
+            cout << "Input '" << sample << "' is a wrong input, thus it is skipped." << endl;
         }
-        temp = NULL;
-        delete temp;
+
     }
     textfile.close();
+    //data();
     return;
 }
-void GodfatherATC::sorting(){
+void GodfatherATC::adding(){
     ptr = head;
     while(ptr != NULL){
         int cntForInput = 0;
@@ -217,21 +237,23 @@ void GodfatherATC::sorting(){
                         }
                         else
                         {
-                            cout <<"------------------" << endl;
+                            //cout <<"------------------" << endl;
 
                             timePtr = timeHead;                                 //Make sure the pointer starts at the beginning of the time list so we can proceed.
                             while((timePtr -> timeSpace) < tempInt && timePtr -> nextTime != NULL)             //Check if the time unit is bigger or equal, if not, move to the next time unit
                             {
-                                cout << "aaaaaaaaaa" << endl;
+                                //cout << timePtr -> timeSpace << endl;
+
                                 timePtr = timePtr -> nextTime;
+
                             }
 
                             if(timePtr -> timeSpace == tempInt)                 //if the time unit is equal, we don't need to create a new time node
                             {
-                                cout << "bbbbbbbbbbbbb" << endl;
+                                //cout << "bbbbbbbbbbbbb" << endl;
                                 if(timePtr -> next == NULL)                     //However we still need to make sure if there is planes under that time unit, if not
                                 {                                               //we create a new plane node
-                                    cout << "cccccccccc" << endl;
+                                    //cout << "cccccccccc" << endl;
                                     Plane *temp = new Plane;
                                     timePtr -> next = temp;
                                     planePtr = temp;                            //DO NOT FORGET THIS
@@ -284,12 +306,16 @@ void GodfatherATC::sorting(){
                             }
                             else //if the next time is larger than the time unit we want to add, that means we need to create a new time node
                             {
-
+                                //cout << "Did i gte here" << endl;
+                                //cout << tempInt << endl;
+                                //cout << timePtr ->timeSpace << endl;
+                                //cout << timePtr ->prevTime ->timeSpace << endl;
                                 timeUnit *temp = new timeUnit;
-                                temp -> nextTime = timePtr -> nextTime;                     //I made the time struct this way because of this kind of situation
-                                temp -> prevTime = timePtr;                     //where we need to link the new time node to a previous and next time node
+                                temp -> nextTime = timePtr;                     //I made the time struct this way because of this kind of situation
+                                temp -> prevTime = timePtr -> prevTime;                     //where we need to link the new time node to a previous and next time node
                                 temp -> timeSpace = tempInt;
-                                timePtr -> nextTime = temp;
+                                timePtr -> prevTime -> nextTime = temp;
+                                timePtr -> prevTime = temp;
                                 timePtr = temp;
                                 temp = NULL;
                                 delete temp;
@@ -323,6 +349,9 @@ void GodfatherATC::sorting(){
     }
 
 }
+void GodfatherATC::sorting(){
+
+}
 void GodfatherATC::wait(){
 
 }
@@ -343,7 +372,7 @@ void GodfatherATC::errorLine(){
 }
 void GodfatherATC::checking(){
     timePtr = timeHead;
-    int statsForNow = 0;
+    int statsForNow = 1;
     while(timePtr != NULL)
     {
         cout << "At time " << timePtr -> timeSpace << endl;
@@ -361,10 +390,170 @@ void GodfatherATC::checking(){
 
 
 }
+bool GodfatherATC::checkInput(string a){
+    int cntForInput = 0;
+    int inputLocation = 0;
+    bool tempBool = false;
+    for(int i = 0; i < a.size(); i++){
+        if(a.at(i) == ',')
+        {
+            if(cntForInput == 0)
+            {
+                if(i != 1)
+                {
+                    //cout << i << endl;
+                    tempBool = true;
+                }
+                if(a.at(inputLocation) == 'D' || a.at(inputLocation) == 'P' || a.at(inputLocation) == 'W')
+                {
+                    cntForInput++;
+                    inputLocation = i + 1;
+                }
+                else
+                {
+
+                    tempBool = true;
+                }
+            }
+            else if(cntForInput == 1)
+            {
+                string tTime = "";
+                //cout << a << endl;
+                //cout << inputLocation << " " << i << endl;
+
+                tTime = a.substr(inputLocation, i - inputLocation);
+                //cout << tTime << endl;
+                for(int x = 0; x < tTime.size(); x++)
+                {
+                    if(!isdigit(tTime.at(x)))
+                    {
+                        tempBool = true;
+                    }
+                }
+                cntForInput++;
+                inputLocation = i + 1;
+            }
+            else if(cntForInput == 2)
+            {
+                if(i != inputLocation + 1)
+                {
+                    //cout << i << endl;
+                    tempBool = true;
+                }
+                if(a.at(inputLocation) == 'D' || a.at(inputLocation) == 'A')
+                {
+                    cntForInput++;
+                    inputLocation = i + 1;
+                }
+                else
+                {
+
+                    tempBool = true;
+                }
+
+            }
+            else if(cntForInput == 3)
+            {
+                string tFuel = "";
+                //cout << a << endl;
+                //cout << inputLocation << " " << i << endl;
+
+                tFuel = a.substr(inputLocation, i - inputLocation);
+                //cout << tFuel << endl;
+                for(int y = 0; y < tFuel.size(); y++)
+                {
+                    if(!isdigit(tFuel.at(y)))
+                    {
+                        tempBool = true;
+                    }
+                }
+                cntForInput++;
+                inputLocation = i + 1;
+
+            }
+            else if(cntForInput == 4)
+            {
+                string tPeople = "";
+                //cout << a << endl;
+                //cout << inputLocation << " " << i << endl;
+
+                tPeople = a.substr(inputLocation, i - inputLocation);
+                //cout << tPeople << endl;
+                for(int y = 0; y < tPeople.size(); y++)
+                {
+                    if(!isdigit(tPeople.at(y)))
+                    {
+                        tempBool = true;
+                    }
+                }
+                cntForInput++;
+                inputLocation = i + 1;
+
+            }
+            else if(cntForInput == 5)
+            {
+                string tCargo = "";
+                int pCounter = 0;
+                //cout << a << endl;
+                //cout << inputLocation << " " << i << endl;
+
+                tCargo = a.substr(inputLocation, i - inputLocation);
+                //cout << tCargo << endl;
+                for(int y = 0; y < tCargo.size(); y++)
+                {
+                    if(!isdigit(tCargo.at(y)))
+                    {
+                        if(tCargo.at(y) != '.')
+                        {
+                            tempBool = true;
+                        }
+                        else
+                        {
+                            pCounter++;
+                        }
+                    }
+                }
+                if(pCounter > 1)
+                {
+                    tempBool = true;
+                }
+                else
+                {
+                    cntForInput++;
+                    inputLocation = i + 1;
+                }
+
+            }
+            else if(cntForInput == 6)
+            {
+                if(i != inputLocation + 1)
+                {
+                    //cout << i << endl;
+                    tempBool = true;
+                }
+                if(a.at(inputLocation) == 'N' || a.at(inputLocation) == 'Y')
+                {
+                    cntForInput++;
+                    inputLocation = i + 1;
+                }
+                else
+                {
+
+                    tempBool = true;
+                }
+            }
+            else if(cntForInput > 6)
+            {
+                tempBool = true;
+            }
+        }
+    }
+    return tempBool;
+}
 
 int main(){
     GodfatherATC Sherloc;
     Sherloc.takingInput();
-    Sherloc.sorting();
+    Sherloc.adding();
     Sherloc.checking();
 }
