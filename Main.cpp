@@ -387,9 +387,18 @@ void GodfatherATC::checking(){
         planePtr = timePtr -> next;
         while(planePtr != NULL)
         {
-            cout << statsForNow << endl;
+            //cout << statsForNow << endl;
             statsForNow++;
             planePtr = planePtr -> nextPlane;
+            cout<<"######################################"<<endl;
+            cout<<"#               _                    #"<<endl;
+            cout<<"#             -=\\`\\                  #"<<endl;
+            cout<<"#         |\\ ____\\_\\___              #"<<endl;
+            cout<<"#       -=\\c` ''''''''' `)           #"<<endl;
+            cout<<"#          `~~~~~/ /~~`\              #"<<endl;
+            cout<<"#            -==/ /                  #"<<endl;
+            cout<<"#              '-'                   #"<<endl;
+            cout<<"######################################"<<endl;
         }
 
         timePtr = timePtr -> nextTime;
