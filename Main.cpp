@@ -16,44 +16,42 @@ const int refuelTime = 10;
 const int maxFuel = 1000;
 
 
-
 class GodfatherATC{
 public:
-    struct Plane{
-        int fuel;
-        int people;
-        double cargo;
-        char dOrA;
-        int timeToExecute;
-        double totalValue;
-        bool grandKid;
-        Plane *nextPlane = NULL;
-        Plane *prevPlane = NULL;
-    };
-    struct timeUnit{
-        int timeSpace;
-        timeUnit *prevTime = NULL;
-        timeUnit *nextTime = NULL;
-        Plane *next = NULL;
-    };
     GodfatherATC();
     void data();
     void statistic();
     void wait();
     void takingInput();
-    void sorting(timeUnit *ptr, Plane *ptr1, int counter);
+    void sorting();
     void errorLine();
     void checking();
     bool checkInput(string a);
     void adding();
-    int planeCounter(Plane *ptr);
+    
     
     struct stringArray{
         string inputs;
         stringArray *next = NULL;
     };
     
-
+    struct Plane{
+        int fuel;
+        int people;
+        double cargo;
+        char dOrA;
+        int timeToExecute; //time planned for departure
+        double totalValue;
+        bool grandKid;
+        Plane *nextPlane = NULL;
+    };
+    
+    struct timeUnit{
+        int timeSpace;
+        timeUnit *prevTime = NULL;
+        timeUnit *nextTime = NULL;
+        Plane *next = NULL;
+    };
     
     
     
@@ -264,7 +262,6 @@ void GodfatherATC::adding(){
                                 }
                                 Plane *temp = new Plane;
                                 planePtr -> nextPlane = temp;
-                                temp->prevPlane = planePtr;
                                 planePtr = planePtr -> nextPlane;
                                 temp = NULL;                                //No memory leak
                                 delete temp;
@@ -392,9 +389,6 @@ void GodfatherATC::adding(){
                     else
                         planePtr->grandKid = false;
                     
-                    planePtr->totalValue = planePtr->cargo + (planePtr->people*hoomanValue);
-                    cout << "Total value = " << planePtr->totalValue << endl;
-                    
                     inputLocation = i + 1;
                     cntForInput++;
                 }
@@ -411,123 +405,116 @@ void GodfatherATC::adding(){
     }
     
 }
-
-int GodfatherATC::planeCounter(Plane *ptr) {
-
-        int indPlane = 0;
-
-        while(ptr != NULL)
-        {
-            
-        
-            ptr = ptr -> nextPlane;
-            
-            indPlane++;
-            
-        }
-
-    return indPlane;
+timeUnit GodfatherATC::sorting(timeUnit* timeHeader){//sorts 1 y-axis 
     
 }
 
-void GodfatherATC::sorting(timeUnit *ptr, Plane *ptr1, int counter){
-
-    Plane *temp = ptr1;
-    
- 
-        if(counter == 0)
+void GodfatherATC::wait(timeUnit* timeHeader){//handles departures, arrivals in one time unit
+    if (planeCounter(timeHeader) == 1) //only 1 plane specified for time slot, allows it to depart/arrive, moves to next
+    {
+        if (timeHeader.nextPlane->dOrA == 'd' || timeHeader.nextPlane->dOrA == 'D')
         {
-            cout << "did I get here?" << endl;
-            if(temp->nextPlane->dOrA == 'A' && temp->dOrA == 'D') {
-                
-                cout << "did I get here?1" << endl;
-                if(temp->prevPlane == NULL)
-                {
-                    Plane *temp2 = temp->nextPlane;
-                    temp->nextPlane = temp2->nextPlane;
-                    temp2 -> prevPlane = temp -> prevPlane;
-                    temp2 -> nextPlane -> prevPlane = temp;
-                    temp2 -> nextPlane = temp;
-                    ptr -> next = temp2;
-                    temp2 = NULL;
-                    delete temp2;
-                    sorting(ptr,temp,counter);
-                
-                }
-                else if(temp->nextPlane->nextPlane == NULL) {
-                    
-                    Plane *temp2 = temp->nextPlane;
-                    temp2 -> prevPlane = temp -> prevPlane;
-                    temp2 -> nextPlane -> prevPlane = temp;
-                    temp2 -> nextPlane = temp;
-                    temp2 = NULL;
-                    delete temp2;
-                    sorting(ptr,temp,counter);
-                    
-                }
-                else
-                {
-                    Plane *temp2 = temp->nextPlane;
-                    temp->nextPlane = temp2->nextPlane;
-                    temp2 -> prevPlane = temp -> prevPlane;
-                    temp2 -> nextPlane -> prevPlane = temp;
-                    temp2 -> nextPlane = temp;
-                    temp2 = NULL;
-                    delete temp2;
-                    sorting(ptr,temp,counter);
-                }
-                
-                
-            }
-            else
-            {
-                sorting(ptr,temp->nextPlane,counter);
-            }
-            //sorting(ptr, temp, counter);
-                
+            cout << "Plane departing from runway 1 at time: " << timeHeader.timeSpace << "\n";
+        }
+        else if(timeHeader.nextPlane->dOrA == 'a' || timeHeader.nextPlane->dOrA == 'A')
+        {
+            cout << "Plane arriving to runway 1 at time: " << timeHeader.timeSpace << "\n";
         }
         
-        else if(counter == 1)
+        //requires deletion to be included, documentation of the values 
+    }
+    else if (planeCounter(timeHeader) == 2)
+    {
+        if (timeHeader.nextPlane->dOrA == 'd' || timeHeader.nextPlane->dOrA == 'D')
         {
-            
-            
+            cout << "Plane departing from runway 1 at time: " << timeHeader.timeSpace << "\n";
+        }
+        else if(timeHeader.nextPlane->dOrA == 'a' || timeHeader.nextPlane->dOrA == 'A')
+        {
+            cout << "Plane arriving to runway 1 at time: " << timeHeader.timeSpace << "\n";
         }
         
-        else if(counter == 2)
+        Plane* secondPlaneSlot = timeHeader.nextPlane->next; //accepts/sends the planes at the second runway
+        
+        if (secondPlaneSlot -> dOrA == 'a' || secondPlaneSlot->dOrA == 'A')
         {
-            
-            
+            cout << "Plane arriving to runway 2 at time: " << timeHeader.timeSpace << "\n";
         }
-        else if(counter == 3)
+        else if (secondPlaneSlot -> dOrA == 'd' || secondPlaneSlot->dOrA == 'D')
         {
-            
-            
+            cout << "Plane departing from runway 2 at time: " << timeHeader.timeSpace << "\n";
         }
-        else if(counter == 4)
+       
+        //requires deletion to be included, documentation of the values 
+    }
+    else if (planeCounter(timeHeader) > 2)
+    {
+        sorting(timeHeader); //sorts based on criteria set by designers, falls through list sending items, eventually transferring overflow
+                            //to the next time slot
+        if (timeHeader.nextPlane->dOrA == 'd' || timeHeader.nextPlane->dOrA == 'D')
         {
-            
-            
+            cout << "Plane departing from runway 1 at time: " << timeHeader.timeSpace << "\n";
         }
-        else if(counter == 5)
+        else if(timeHeader.nextPlane->dOrA == 'a' || timeHeader.nextPlane->dOrA == 'A')
         {
-            
-            
+            cout << "Plane arriving to runway 1 at time: " << timeHeader.timeSpace << "\n";
         }
-        else if(counter == 6)
+        
+        Plane* secondPlaneSlot = timeHeader.nextPlane->next; //accepts/sends the planes at the second runway
+        
+        if (secondPlaneSlot -> dOrA == 'a' || secondPlaneSlot->dOrA == 'A')
         {
-            
-            
+            cout << "Plane arriving to runway 2 at time: " << timeHeader.timeSpace << "\n";
         }
+        else if (secondPlaneSlot -> dOrA == 'd' || secondPlaneSlot->dOrA == 'D')
+        {
+            cout << "Plane departing from runway 2 at time: " << timeHeader.timeSpace << "\n";
+        }
+        
+        //delete both of the previous, link the following 
+        
+        Plane* tempSlot = secondPlaneSlot->nextPlane;
+        
+        while (tempSlot != NULL)
+        {
+            --tempSlot.fuel; //decrements fuel of plane that is being shifted to next slot
+            shiftToNext(tempSlot, timeHeader); //appends to end of next time unit's list
+            
+            tempSlot = tempSlot->nextPlane; //begins process with next in line
+        }
+        
+        //all overflow traffic into next time slot has gas decrememnted, otherwise, no change
+    }    
+}
 
+void GodfatherATC::statistic()
+{
     
 }
-void GodfatherATC::wait(){
+        
+void GodfatherATC::shiftToNext(Plane* planeToShift, timeUnit* timeSlot)
+{ 
+    timeUnit* nextTime = timeSlot.next;
+    
+    Plane* endOfNextSlot = walkToEnd(nextTime->nextPlane);
+    
+    endOfNextSlot->nextPlane = planeToShift;
+    planeToShift->previousPlane = endOfNextSlot;
     
 }
-void GodfatherATC::statistic(){
 
-
+Plane* GodfatherATC::walkToEnd(Plane* currentPlane)
+{
+    if currentPlane == NULL)
+    {
+        return currentPlane;
+    }
+    else 
+    {
+        return walkToEnd(currentPlane->next);
+    }
 }
+
 void GodfatherATC::data(){
     ptr = head;
     while(ptr != NULL){
@@ -544,7 +531,6 @@ void GodfatherATC::checking(){
     timePtr = timeHead;
     //cout << timeHead -> timeSpace << endl;
     int statsForNow = 1;
-    sorting(timeHead, timeHead->next, 0);
     while(timePtr != NULL)
     {
         cout << "At time " << timePtr -> timeSpace << endl;
@@ -552,14 +538,19 @@ void GodfatherATC::checking(){
         planePtr = timePtr -> next;
         while(planePtr != NULL)
         {
-            numberOfPlanes++;
             //cout << statsForNow << endl;
             statsForNow++;
             cout << "Plane is " << planePtr->dOrA << ", with fuel = " << planePtr->fuel << ", carrying " << planePtr->people << " and " << planePtr->cargo << " cargo with grandkid - " << planePtr->grandKid << endl;
-    
             planePtr = planePtr -> nextPlane;
-
-            
+            cout<<"######################################"<<endl;
+            cout<<"#               _                    #"<<endl;
+            cout<<"#             -=\\`\\                  #"<<endl;
+            cout<<"#         |\\ ____\\_\\___              #"<<endl;
+            cout<<"#       -=\\c` ''''''''' `)           #"<<endl;
+            cout<<"#          `~~~~~/ /~~`            #"<<endl;
+            cout<<"#            -==/ /                  #"<<endl;
+            cout<<"#              '-'                   #"<<endl;
+            cout<<"######################################"<<endl;
         }
         
         timePtr = timePtr -> nextTime;
@@ -738,6 +729,5 @@ int main(){
     Sherloc.takingInput();
     Sherloc.adding();
     Sherloc.checking();
-
-    
 }
+
