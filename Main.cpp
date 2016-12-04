@@ -16,25 +16,9 @@ const int refuelTime = 10;
 const int maxFuel = 1000;
 
 
+
 class GodfatherATC{
 public:
-    GodfatherATC();
-    void data();
-    void statistic();
-    void wait();
-    void takingInput();
-    void sorting();
-    void errorLine();
-    void checking();
-    bool checkInput(string a);
-    void adding();
-
-
-    struct stringArray{
-        string inputs;
-        stringArray *next = NULL;
-    };
-
     struct Plane{
         int fuel;
         int people;
@@ -44,27 +28,45 @@ public:
         double totalValue;
         bool grandKid;
         Plane *nextPlane = NULL;
+        Plane *prevPlane = NULL;
     };
-
     struct timeUnit{
         int timeSpace;
         timeUnit *prevTime = NULL;
         timeUnit *nextTime = NULL;
         Plane *next = NULL;
     };
+    GodfatherATC();
+    void data();
+    void statistic();
+    void wait();
+    void takingInput();
+    void sorting(timeUnit *ptr, Plane *ptr1, int counter);
+    void errorLine();
+    void checking();
+    bool checkInput(string a);
+    void adding();
+    int planeCounter(Plane *ptr);
+    
+    struct stringArray{
+        string inputs;
+        stringArray *next = NULL;
+    };
+    
 
-
-
+    
+    
+    
 private:
     stringArray *head;
     stringArray *ptr;
     stringArray *last;
-
+    
     timeUnit *timePtr;
     timeUnit *timeHead;
-
+    
     Plane *planePtr;
-
+    
     int numberOfPlanes;
     int relativeTime;
     int planeCrash;
@@ -74,23 +76,23 @@ private:
     int peopleKilled;
     int grandKidKilled;
     int totalTime;
-
+    
     double safeCargo;
     double destroyedCargo;
     double avgGrandKidArrive;
     double avgGrandKidDepart;
     double avgTOWaitTime;
     double avgLDWaitTime;
-
+    
 };
 GodfatherATC::GodfatherATC(){
     head = NULL;
     ptr = NULL;
     last = NULL;
-
+    
     timePtr = NULL;
     timeHead = NULL;
-
+    
     numberOfPlanes = 0;
     relativeTime = 0;
     safeCargo = 0;
@@ -102,19 +104,19 @@ GodfatherATC::GodfatherATC(){
     peopleSafeLanded = 0;
     peopleKilled = 0;
     grandKidKilled = 0;
-
+    
     avgGrandKidArrive = 0;
     avgGrandKidDepart = 0;
     avgTOWaitTime = 0;
     avgLDWaitTime = 0;
-
+    
 }
 void GodfatherATC::takingInput(){
     ifstream textfile;
     string sample;
     //textfile.open("FP.txt");
-    textfile.open("Ige.txt");
-    //textfile.open("AutomatedInput.txt");
+    //textfile.open("TS.txt");
+    textfile.open("AutomatedInput.txt");
     if(textfile.fail()){
         cerr << "Error Opening File!" << endl;
         exit(1);
@@ -125,7 +127,7 @@ void GodfatherATC::takingInput(){
         string nospace = "";
         for(int a = 0; a < sample.size(); a++){ // get rid of all the spaces in the input.
             if((sample).at(a) != ' '){
-
+                
                 nospace += toupper(((sample).at(a)));
             }
         }
@@ -157,7 +159,7 @@ void GodfatherATC::takingInput(){
         {
             cout << "Input '" << sample << "' is a wrong input, thus it is skipped." << endl;
         }
-
+        
     }
     textfile.close();
     data();
@@ -192,7 +194,7 @@ void GodfatherATC::adding(){
                         {
                             inputLocation = i + 1;
                             cntForInput++;
-
+                            
                         }
                         else if(nospace.at(inputLocation) == 'P' || nospace.at(inputLocation) == 'p')//P we call the function and break the loop so it does not fuck us up
                         {
@@ -211,13 +213,13 @@ void GodfatherATC::adding(){
                             errorLine();
                             break;
                         }
-
+                        
                     }
                 }
-
+                
                 else if(cntForInput == 1) //when cnt is 1, which means the input is suppose to be the time unit
                 {
-
+                    
                     if(isdigit(nospace.at(inputLocation)))  //you check if the input is a number, if it is true
                     {
                         int tempInt = atof(nospace.substr(inputLocation,(i - inputLocation)).c_str());  //For convenience, we make a temp for the input.
@@ -241,20 +243,20 @@ void GodfatherATC::adding(){
                         }
                         else
                         {
-
-
+                            
+                            
                             timePtr = timeHead;                                 //Make sure the pointer starts at the beginning of the time list so we can proceed.
                             //cout << timeHead ->timeSpace << endl;
                             while((timePtr -> timeSpace) < tempInt && timePtr -> nextTime != NULL)             //Check if the time unit is bigger or equal, if not, move to the next time unit
                             {
                                 //cout << timePtr -> timeSpace << endl;
                                 timePtr = timePtr -> nextTime;
-
+                                
                             }
-
+                            
                             if(timePtr -> timeSpace == tempInt)                 //if the time unit is equal, we don't need to create a new time node
                             {
-
+                                
                                 planePtr = timePtr -> next;
                                 while(planePtr -> nextPlane != NULL)        //we go to the last plane node, however, I am not sure if we compare it as we go, but lets
                                 {                                           //have this way for now
@@ -262,6 +264,7 @@ void GodfatherATC::adding(){
                                 }
                                 Plane *temp = new Plane;
                                 planePtr -> nextPlane = temp;
+                                temp->prevPlane = planePtr;
                                 planePtr = planePtr -> nextPlane;
                                 temp = NULL;                                //No memory leak
                                 delete temp;
@@ -272,7 +275,7 @@ void GodfatherATC::adding(){
                             else if(timePtr -> timeSpace < tempInt)
                             {
                                 timeUnit *temp = new timeUnit;
-
+                                
                                 temp -> prevTime = timePtr;
                                 timePtr -> nextTime = temp;
                                 temp -> timeSpace = tempInt;
@@ -285,14 +288,14 @@ void GodfatherATC::adding(){
                                 temp1 = NULL;
                                 delete temp1;
                                 planePtr -> timeToExecute = tempInt;
-
+                                
                                 inputLocation = i + 1;
                                 cntForInput++;
-
+                                
                             }
                             else //if the next time is larger than the time unit we want to add, that means we need to create a new time node
                             {
-
+                                
                                 //cout << tempInt << endl;
                                 //cout << timePtr -> timeSpace << endl;
                                 //cout << timeHead -> timeSpace << endl;
@@ -337,7 +340,7 @@ void GodfatherATC::adding(){
                             }
                         }
                     }
-
+                    
                     else
                     {
                         errorLine();
@@ -350,7 +353,7 @@ void GodfatherATC::adding(){
                         planePtr->dOrA = 'D';
                     else
                         planePtr->dOrA = 'A';
-
+                    
                     inputLocation = i + 1;
                     cntForInput++;
                 }
@@ -358,29 +361,29 @@ void GodfatherATC::adding(){
                 {
                     int tempFuel = atof(nospace.substr(inputLocation,(i - inputLocation)).c_str());
                     planePtr->fuel =tempFuel;
-
-
+                    
+                    
                     inputLocation = i + 1;
                     cntForInput++;
-
+                    
                 }
                 else if(cntForInput == 4)
                 {
                     int tempPeople = atof(nospace.substr(inputLocation,(i - inputLocation)).c_str());
                     planePtr->people = tempPeople;
-
+                    
                     inputLocation = i + 1;
                     cntForInput++;
-
+                    
                 }
                 else if(cntForInput == 5)
                 {
                     double tempCargo = atof(nospace.substr(inputLocation,(i - inputLocation)).c_str());
                     planePtr->cargo = tempCargo;
-
+                    
                     inputLocation = i + 1;
                     cntForInput++;
-
+                    
                 }
                 else if(cntForInput == 6)
                 {
@@ -388,10 +391,10 @@ void GodfatherATC::adding(){
                         planePtr->grandKid = true;
                     else
                         planePtr->grandKid = false;
-
+                    
                     planePtr->totalValue = planePtr->cargo + (planePtr->people*hoomanValue);
                     cout << "Total value = " << planePtr->totalValue << endl;
-
+                    
                     inputLocation = i + 1;
                     cntForInput++;
                 }
@@ -402,33 +405,124 @@ void GodfatherATC::adding(){
                 }
             }
         }
-
-
+        
+        
         ptr = ptr -> next;
     }
-
+    
 }
-void GodfatherATC::sorting(){
 
-    timePtr = timeHead;
-    while(timePtr != NULL)
-    {
+int GodfatherATC::planeCounter(Plane *ptr) {
 
-        planePtr = timePtr -> next;
-        while(planePtr != NULL)
+        int indPlane = 0;
+
+        while(ptr != NULL)
         {
-
-
-            planePtr = planePtr -> nextPlane;
-
+            
+        
+            ptr = ptr -> nextPlane;
+            
+            indPlane++;
+            
         }
 
-        timePtr = timePtr -> nextTime;
-    }
+    return indPlane;
+    
+}
 
+void GodfatherATC::sorting(timeUnit *ptr, Plane *ptr1, int counter){
+
+    Plane *temp = ptr1;
+    
+ 
+        if(counter == 0)
+        {
+            cout << "did I get here?" << endl;
+            if(temp->nextPlane->dOrA == 'A' && temp->dOrA == 'D') {
+                
+                cout << "did I get here?1" << endl;
+                if(temp->prevPlane == NULL)
+                {
+                    Plane *temp2 = temp->nextPlane;
+                    temp->nextPlane = temp2->nextPlane;
+                    temp2 -> prevPlane = temp -> prevPlane;
+                    temp2 -> nextPlane -> prevPlane = temp;
+                    temp2 -> nextPlane = temp;
+                    ptr -> next = temp2;
+                    temp2 = NULL;
+                    delete temp2;
+                    sorting(ptr,temp,counter);
+                
+                }
+                else if(temp->nextPlane->nextPlane == NULL) {
+                    
+                    Plane *temp2 = temp->nextPlane;
+                    temp2 -> prevPlane = temp -> prevPlane;
+                    temp2 -> nextPlane -> prevPlane = temp;
+                    temp2 -> nextPlane = temp;
+                    temp2 = NULL;
+                    delete temp2;
+                    sorting(ptr,temp,counter);
+                    
+                }
+                else
+                {
+                    Plane *temp2 = temp->nextPlane;
+                    temp->nextPlane = temp2->nextPlane;
+                    temp2 -> prevPlane = temp -> prevPlane;
+                    temp2 -> nextPlane -> prevPlane = temp;
+                    temp2 -> nextPlane = temp;
+                    temp2 = NULL;
+                    delete temp2;
+                    sorting(ptr,temp,counter);
+                }
+                
+                
+            }
+            else
+            {
+                sorting(ptr,temp->nextPlane,counter);
+            }
+            //sorting(ptr, temp, counter);
+                
+        }
+        
+        else if(counter == 1)
+        {
+            
+            
+        }
+        
+        else if(counter == 2)
+        {
+            
+            
+        }
+        else if(counter == 3)
+        {
+            
+            
+        }
+        else if(counter == 4)
+        {
+            
+            
+        }
+        else if(counter == 5)
+        {
+            
+            
+        }
+        else if(counter == 6)
+        {
+            
+            
+        }
+
+    
 }
 void GodfatherATC::wait(){
-
+    
 }
 void GodfatherATC::statistic(){
 
@@ -444,15 +538,15 @@ void GodfatherATC::data(){
 }
 void GodfatherATC::errorLine(){
     cout << "Your input is wrong." << endl;
-
+    
 }
 void GodfatherATC::checking(){
     timePtr = timeHead;
     //cout << timeHead -> timeSpace << endl;
     int statsForNow = 1;
+    sorting(timeHead, timeHead->next, 0);
     while(timePtr != NULL)
     {
-        int indPlane = 0;
         cout << "At time " << timePtr -> timeSpace << endl;
         //cout << timePtr ->timeSpace << " unit"<< endl;
         planePtr = timePtr -> next;
@@ -462,18 +556,16 @@ void GodfatherATC::checking(){
             //cout << statsForNow << endl;
             statsForNow++;
             cout << "Plane is " << planePtr->dOrA << ", with fuel = " << planePtr->fuel << ", carrying " << planePtr->people << " and " << planePtr->cargo << " cargo with grandkid - " << planePtr->grandKid << endl;
-
+    
             planePtr = planePtr -> nextPlane;
 
-            indPlane++;
-
+            
         }
-        cout << "num of ind planes = " << indPlane<< endl;
-
+        
         timePtr = timePtr -> nextTime;
     }
-
-    cout << "num of planes = " << numberOfPlanes<< endl;
+    
+    
 }
 bool GodfatherATC::checkInput(string a){
     int cntForInput = 0;
@@ -500,17 +592,17 @@ bool GodfatherATC::checkInput(string a){
                 }
                 else
                 {
-
+                    
                     tempBool = true;
                 }
-
+                
             }
             else if(cntForInput == 1)
             {
                 string tTime = "";
                 //cout << a << endl;
                 //cout << inputLocation << " " << i << endl;
-
+                
                 tTime = a.substr(inputLocation, i - inputLocation);
                 //cout << tTime << endl;
                 for(int x = 0; x < tTime.size(); x++)
@@ -537,17 +629,17 @@ bool GodfatherATC::checkInput(string a){
                 }
                 else
                 {
-
+                    
                     tempBool = true;
                 }
-
+                
             }
             else if(cntForInput == 3)
             {
                 string tFuel = "";
                 //cout << a << endl;
                 //cout << inputLocation << " " << i << endl;
-
+                
                 tFuel = a.substr(inputLocation, i - inputLocation);
                 //cout << tFuel << endl;
                 for(int y = 0; y < tFuel.size(); y++)
@@ -559,14 +651,14 @@ bool GodfatherATC::checkInput(string a){
                 }
                 cntForInput++;
                 inputLocation = i + 1;
-
+                
             }
             else if(cntForInput == 4)
             {
                 string tPeople = "";
                 //cout << a << endl;
                 //cout << inputLocation << " " << i << endl;
-
+                
                 tPeople = a.substr(inputLocation, i - inputLocation);
                 //cout << tPeople << endl;
                 for(int y = 0; y < tPeople.size(); y++)
@@ -578,7 +670,7 @@ bool GodfatherATC::checkInput(string a){
                 }
                 cntForInput++;
                 inputLocation = i + 1;
-
+                
             }
             else if(cntForInput == 5)
             {
@@ -586,7 +678,7 @@ bool GodfatherATC::checkInput(string a){
                 int pCounter = 0;
                 //cout << a << endl;
                 //cout << inputLocation << " " << i << endl;
-
+                
                 tCargo = a.substr(inputLocation, i - inputLocation);
                 //cout << tCargo << endl;
                 for(int y = 0; y < tCargo.size(); y++)
@@ -612,7 +704,7 @@ bool GodfatherATC::checkInput(string a){
                     cntForInput++;
                     inputLocation = i + 1;
                 }
-
+                
             }
             else if(cntForInput == 6)
             {
@@ -628,7 +720,7 @@ bool GodfatherATC::checkInput(string a){
                 }
                 else
                 {
-
+                    
                     tempBool = true;
                 }
             }
@@ -646,4 +738,6 @@ int main(){
     Sherloc.takingInput();
     Sherloc.adding();
     Sherloc.checking();
+
+    
 }
