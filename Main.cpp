@@ -394,8 +394,8 @@ void GodfatherATC::checking(){
             cout<<"#               _                    #"<<endl;
             cout<<"#             -=\\`\\                  #"<<endl;
             cout<<"#         |\\ ____\\_\\___              #"<<endl;
-            cout<<"#       -=\\c` ''''''''' `)           #"<<endl;
-            cout<<"#          `~~~~~/ /~~`\              #"<<endl;
+            cout<<"#       -=\\ c` ''''''''' `)           #"<<endl;
+            cout<<"#          `~~~~~/ /~~`             #"<<endl;
             cout<<"#            -==/ /                  #"<<endl;
             cout<<"#              '-'                   #"<<endl;
             cout<<"######################################"<<endl;
