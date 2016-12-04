@@ -389,6 +389,9 @@ void GodfatherATC::adding(){
                     else
                         planePtr->grandKid = false;
                     
+                    planePtr->totalValue = planePtr->cargo + (planePtr->people*hoomanValue);
+                    cout << "Total value = " << planePtr->totalValue << endl;
+                    
                     inputLocation = i + 1;
                     cntForInput++;
                 }
@@ -407,12 +410,29 @@ void GodfatherATC::adding(){
 }
 void GodfatherATC::sorting(){
     
+    timePtr = timeHead;
+    while(timePtr != NULL)
+    {
+        
+        planePtr = timePtr -> next;
+        while(planePtr != NULL)
+        {
+            
+            
+            planePtr = planePtr -> nextPlane;
+            
+        }
+        
+        timePtr = timePtr -> nextTime;
+    }
+    
 }
 void GodfatherATC::wait(){
     
 }
 void GodfatherATC::statistic(){
-    
+
+
 }
 void GodfatherATC::data(){
     ptr = head;
@@ -432,30 +452,28 @@ void GodfatherATC::checking(){
     int statsForNow = 1;
     while(timePtr != NULL)
     {
+        int indPlane = 0;
         cout << "At time " << timePtr -> timeSpace << endl;
         //cout << timePtr ->timeSpace << " unit"<< endl;
         planePtr = timePtr -> next;
         while(planePtr != NULL)
         {
+            numberOfPlanes++;
             //cout << statsForNow << endl;
             statsForNow++;
             cout << "Plane is " << planePtr->dOrA << ", with fuel = " << planePtr->fuel << ", carrying " << planePtr->people << " and " << planePtr->cargo << " cargo with grandkid - " << planePtr->grandKid << endl;
+    
             planePtr = planePtr -> nextPlane;
-            cout<<"######################################"<<endl;
-            cout<<"#               _                    #"<<endl;
-            cout<<"#             -=\\`\\                  #"<<endl;
-            cout<<"#         |\\ ____\\_\\___              #"<<endl;
-            cout<<"#       -=\\c` ''''''''' `)           #"<<endl;
-            cout<<"#          `~~~~~/ /~~`            #"<<endl;
-            cout<<"#            -==/ /                  #"<<endl;
-            cout<<"#              '-'                   #"<<endl;
-            cout<<"######################################"<<endl;
+            
+            indPlane++;
+           
         }
+        cout << "num of ind planes = " << indPlane<< endl;
         
         timePtr = timePtr -> nextTime;
     }
     
-    
+    cout << "num of planes = " << numberOfPlanes<< endl;
 }
 bool GodfatherATC::checkInput(string a){
     int cntForInput = 0;
@@ -629,4 +647,3 @@ int main(){
     Sherloc.adding();
     Sherloc.checking();
 }
-
