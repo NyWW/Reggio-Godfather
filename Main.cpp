@@ -41,12 +41,13 @@ public:
     void statistic();
     void wait();
     void takingInput();
-    void sorting(timeUnit *ptr, Plane *ptr1, int counter);
+    void sorting(Plane *ptr);
     void errorLine();
     void checking();
     bool checkInput(string a);
     void adding();
     int planeCounter(Plane *ptr);
+    void swapping(Plane *ptr, Plane *nextP);
     
     struct stringArray{
         string inputs;
@@ -393,7 +394,6 @@ void GodfatherATC::adding(){
                         planePtr->grandKid = false;
                     
                     planePtr->totalValue = planePtr->cargo + (planePtr->people*hoomanValue);
-                    cout << "Total value = " << planePtr->totalValue << endl;
                     
                     inputLocation = i + 1;
                     cntForInput++;
@@ -430,63 +430,94 @@ int GodfatherATC::planeCounter(Plane *ptr) {
     
 }
 
-void GodfatherATC::sorting(timeUnit *ptr, Plane *ptr1, int counter){
-
-    Plane *temp = ptr1;
+void GodfatherATC::swapping(Plane *ptr, Plane *nextP) {
     
- 
-        if(counter == 0)
-        {
-            cout << "did I get here?" << endl;
-            if(temp->nextPlane->dOrA == 'A' && temp->dOrA == 'D') {
+    int tempFuel;
+    int tempPeople;
+    double tempCargo;
+    char tempDorA;
+    int tempTimeToExecute;
+    double tempTotalValue;
+    bool tempGrandKid;
+    
+    
+    tempFuel = ptr->fuel;
+    ptr->fuel = nextP->fuel;
+    nextP->fuel = tempFuel;
+    
+    tempPeople = ptr->people;
+    ptr->people = nextP->people;
+    nextP->people = tempPeople;
+    
+    tempCargo = ptr->cargo;
+    ptr->cargo = nextP->cargo;
+    nextP->cargo = tempCargo;
+    
+    tempDorA = ptr->dOrA;
+    ptr->dOrA = nextP->dOrA;
+    nextP->dOrA = tempDorA;
+    
+    tempTimeToExecute = ptr->timeToExecute;
+    ptr->timeToExecute = nextP->timeToExecute;
+    nextP->timeToExecute = tempTimeToExecute;
+    
+    tempTotalValue = ptr->totalValue;
+    ptr->totalValue = nextP->totalValue;
+    nextP->totalValue = tempTotalValue;
+    
+    tempGrandKid = ptr->grandKid;
+    ptr->grandKid = nextP->grandKid;
+    nextP->grandKid = tempGrandKid;
+    
+    
+}
+
+void GodfatherATC::sorting(Plane *ptr)
+
+{
+
+    Plane *nextP = ptr->nextPlane;
+
+            if(nextP != NULL) {
                 
-                cout << "did I get here?1" << endl;
-                if(temp->prevPlane == NULL)
+                
+                if(nextP->dOrA == 'A' && ptr->dOrA == 'D')
                 {
-                    Plane *temp2 = temp->nextPlane;
-                    temp->nextPlane = temp2->nextPlane;
-                    temp2 -> prevPlane = temp -> prevPlane;
-                    temp2 -> nextPlane -> prevPlane = temp;
-                    temp2 -> nextPlane = temp;
-                    ptr -> next = temp2;
-                    temp2 = NULL;
-                    delete temp2;
-                    sorting(ptr,temp,counter);
+                    
+                    swapping(ptr, nextP);
+                    
+                }
                 
-                }
-                else if(temp->nextPlane->nextPlane == NULL) {
-                    
-                    Plane *temp2 = temp->nextPlane;
-                    temp2 -> prevPlane = temp -> prevPlane;
-                    temp2 -> nextPlane -> prevPlane = temp;
-                    temp2 -> nextPlane = temp;
-                    temp2 = NULL;
-                    delete temp2;
-                    sorting(ptr,temp,counter);
-                    
-                }
-                else
+                else if(nextP->dOrA == 'D' && ptr->dOrA == 'D')
                 {
-                    Plane *temp2 = temp->nextPlane;
-                    temp->nextPlane = temp2->nextPlane;
-                    temp2 -> prevPlane = temp -> prevPlane;
-                    temp2 -> nextPlane -> prevPlane = temp;
-                    temp2 -> nextPlane = temp;
-                    temp2 = NULL;
-                    delete temp2;
-                    sorting(ptr,temp,counter);
+                    if(nextP->grandKid == true && ptr->grandKid == false)
+                        swapping(ptr, nextP);
+                    else if(nextP->grandKid == true && ptr->grandKid == true)
+                    {
+                        if(nextP->totalValue > ptr->totalValue) // or total value, not sure
+                            swapping(ptr, nextP);
+                    }
+                        
+                    
                 }
                 
+                else if(nextP->dOrA == 'A' && ptr->dOrA == 'A')
+                {
+                    
+                    if(nextP->fuel < nextP->fuel)
+                        swapping(ptr, nextP);
+                    
+                }
+
                 
+                ptr = ptr->nextPlane;
+                sorting(ptr);
+
             }
-            else
-            {
-                sorting(ptr,temp->nextPlane,counter);
-            }
-            //sorting(ptr, temp, counter);
-                
-        }
-        
+    
+    
+/*
+    
         else if(counter == 1)
         {
             
@@ -518,7 +549,7 @@ void GodfatherATC::sorting(timeUnit *ptr, Plane *ptr1, int counter){
             
             
         }
-
+*/
     
 }
 void GodfatherATC::wait(){
@@ -544,7 +575,7 @@ void GodfatherATC::checking(){
     timePtr = timeHead;
     //cout << timeHead -> timeSpace << endl;
     int statsForNow = 1;
-    sorting(timeHead, timeHead->next, 0);
+    sorting(timeHead->next);
     while(timePtr != NULL)
     {
         cout << "At time " << timePtr -> timeSpace << endl;
