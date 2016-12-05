@@ -17,8 +17,31 @@ public:
     double fRand(double fMin, double fMax);
     void outputToText();
     int fInt(int iMax);
+    int timeUnit();
     string cRand(int label);
+    int ti = 0;
+    int fFuel(int a);
 };
+int Generator::fFuel(int a){
+
+    int f = rand()%(a + 1) + 20;
+    return f;
+
+
+}
+int Generator::timeUnit()
+{
+    int t = rand()% 10 + 1;
+    if(t == 1)
+    {
+        ti++;
+        return ti;
+    }
+    else
+    {
+        return ti;
+    }
+}
 double Generator::fRand(double fMin, double fMax)
 {
     double f = (double)rand() / RAND_MAX;
@@ -61,29 +84,26 @@ void Generator::outputToText()
             if(cntForOneInput == 0)
             {
                 tempChar = cRand(1);
-                tempSample.append(tempChar);
-                cntForOneInput++;
+                if(tempChar == "P" || tempChar == "W")
+                {
+                    tempSample.append(tempChar);
+                    breakTheLoop = false;
+                }
+                else
+                {
+                    tempSample.append(tempChar);
+                    cntForOneInput++;
+                }
+
+
             }
             else if(cntForOneInput == 1)
             {
                 tempSample.append(",");
-                int a = fInt(maxTime);
+                int a = timeUnit();
                 stringstream ss;
                 ss << a;
                 tempSample.append(ss.str());
-                int b = rand()% 30 + 1;
-                if(b == 1)
-                {
-                    tempSample.append(".05");
-                }
-                else if(b == 2)
-                {
-                    tempSample.append("R.");
-                }
-                else
-                {
-
-                }
                 cntForOneInput++;
             }
             else if(cntForOneInput == 2)
@@ -96,23 +116,18 @@ void Generator::outputToText()
             else if(cntForOneInput == 3)
             {
                 tempSample.append(",");
-                int ab = fInt(maxFuel);
-                stringstream ss;
-                ss << ab;
-                tempSample.append(ss.str());
-                int bc = rand()% 30 + 1;
-                if(bc == 1)
+                int ab;
+                if(tempChar == "D")
                 {
-                    tempSample.append(".05");
-                }
-                else if(bc == 2)
-                {
-                    tempSample.append("R.");
+                    ab = fFuel(maxFuel);
                 }
                 else
                 {
-
+                    ab = fInt(maxFuel);
                 }
+                stringstream ss;
+                ss << ab;
+                tempSample.append(ss.str());
                 cntForOneInput++;
             }
             else if(cntForOneInput == 4)
@@ -122,19 +137,6 @@ void Generator::outputToText()
                 stringstream ss;
                 ss << abc;
                 tempSample.append(ss.str());
-                int bcd = rand()% 30 + 1;
-                if(bcd == 1)
-                {
-                    tempSample.append(".05");
-                }
-                else if(bcd == 2)
-                {
-                    tempSample.append("R.");
-                }
-                else
-                {
-
-                }
                 cntForOneInput++;
             }
             else if(cntForOneInput == 5)
@@ -144,19 +146,6 @@ void Generator::outputToText()
                 stringstream ss;
                 ss << x;
                 tempSample.append(ss.str());
-                int y = rand()% 30 + 1;
-                if(y == 1)
-                {
-                    tempSample.append(".05");
-                }
-                else if(y == 2)
-                {
-                    tempSample.append("R.");
-                }
-                else
-                {
-
-                }
                 cntForOneInput++;
             }
             else if(cntForOneInput == 6)
@@ -168,15 +157,6 @@ void Generator::outputToText()
             }
             else if(cntForOneInput > 6)
             {
-                int z = rand()% 30 + 1;
-                if(z == 1)
-                {
-                    tempSample.append("//");
-                }
-                else
-                {
-
-                }
                 breakTheLoop = false;
             }
         }
@@ -199,94 +179,30 @@ string Generator::cRand(int label){
     int a;
     if(label == 1)
     {
-        a = rand()% 8 + 1;
-        if(a == 1)
-        {
-            return "d ";
-        }
-        else if(a == 2)
-        {
-            return "p ";
-        }
-        else if (a == 3)
-        {
-            return "w ";
-        }
-        else if(a == 4)
-        {
-            return "D";
-        }
-        else if(a == 5)
-        {
-            return "P";
-        }
-        else if (a == 6)
-        {
-            return "W ";
-        }
-        else if(a == 7)
-        {
-            return "*";
-        }
-        else
-        {
-            return "r ";
-        }
+        return "D";
     }
     else if(label == 2)
     {
-        a = rand()% 6 + 1;
+        a = rand()% 2 + 1;
         if(a == 1)
-        {
-            return "d ";
-        }
-        else if(a == 2)
-        {
-            return "a ";
-        }
-        else if(a == 3)
         {
             return "D";
         }
-        else if(a == 4)
+        else if(a == 2)
         {
             return "A";
-        }
-        else if(a == 5)
-        {
-            return "*";
-        }
-        else
-        {
-            return "r ";
         }
     }
     else if(label == 3)
     {
-        a = rand()% 6 + 1;
+        a = rand()% 2 + 1;
         if(a == 1)
         {
-            return "y ";
+            return "Y";
         }
         else if(a == 2)
         {
-            return "n ";
-        }
-        else if(a == 3)
-        {
-            return "Y ";
-        }
-        else if(a == 4)
-        {
-            return "N ";
-        }
-        else if(a == 5)
-        {
-            return "*";
-        }
-        else
-        {
-            return "r ";
+            return "N";
         }
     }
     return c;
