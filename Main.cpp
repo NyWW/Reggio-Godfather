@@ -41,7 +41,7 @@ public:
     void statistic();
     void wait();
     void takingInput();
-    void sorting(timeUnit *ptr1, Plane *ptr, int counter);
+    void sorting(timeUnit *ptr1, Plane *ptr);
     void errorLine();
     void checking();
     bool checkInput(string a);
@@ -266,7 +266,7 @@ void GodfatherATC::adding(){
                             }
                             else if(timePtr -> timeSpace < tempInt)
                             {
-                                sorting(timePtr, timePtr ->next, 0);
+                                sorting(timePtr, timePtr ->next);
 
 
 
@@ -469,44 +469,9 @@ void GodfatherATC::swapping(Plane *ptr, Plane *nextP) {
 
 }
 
-void GodfatherATC::sorting(timeUnit *ptr1, Plane *ptr, int counter)
+void GodfatherATC::sorting(timeUnit *ptr1, Plane *ptr)
 {
-    if(counter  == 0)
-    {
-        ptr1 -> next = mergeSort(ptr);
-        sorting(ptr1, ptr1 ->next,1);
-    }
-    else if(counter == 1)
-    {
-
-        sorting(ptr1, ptr1 ->next,2);
-    }
-
-    else if(counter == 2)
-    {
-
-        sorting(ptr1, ptr1 ->next,3);
-    }
-    else if(counter == 3)
-    {
-
-        sorting(ptr1, ptr1 ->next,4);
-    }
-    else if(counter == 4)
-    {
-
-        sorting(ptr1, ptr1 ->next,5);
-    }
-    else if(counter == 5)
-    {
-
-        sorting(ptr1, ptr1 ->next,6);
-    }
-    else if(counter == 6)
-    {
-
-    }
-
+    ptr1 -> next = mergeSort(ptr);
 
 }
 void GodfatherATC::wait(){
@@ -535,7 +500,7 @@ void GodfatherATC::checking(){
 
     while(timePtr != NULL)
     {
-        sorting(timePtr, timePtr->next, 0);
+        sorting(timePtr, timePtr->next);
         cout << "At time " << timePtr -> timeSpace << endl;
         //cout << timePtr ->timeSpace << " unit"<< endl;
         planePtr = timePtr -> next;
