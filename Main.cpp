@@ -208,7 +208,6 @@ void GodfatherATC::adding(){
                     {
                         inputLocation = i + 1;
                         cntForInput++;
-
                     }
                     else if(nospace.at(inputLocation) == 'P')//P we call the function and break the loop so it does not fuck us up
                     {
@@ -224,7 +223,6 @@ void GodfatherATC::adding(){
                     }
 
                 }
-
                 else if(cntForInput == 1) //when cnt is 1, which means the input is suppose to be the time unit
                 {
 
@@ -407,19 +405,15 @@ void GodfatherATC::adding(){
 
         sorting(timeHead, timeHead->next);
         process(timeHead, timeHead->next);
-
-        cout << "wait a minute" << endl;
-        checking();
+        //checking();
     }
-    wait();
-    statistic();
+
+    cout << "awasd" << endl;
 }
 
 void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
     Plane *temp1 = ptr;
     Plane *temp2 = ptr-> nextPlane;
-
-
     ptr = ptr -> nextPlane -> nextPlane;
     if(ptr == NULL)
     {
