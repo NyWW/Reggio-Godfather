@@ -401,15 +401,12 @@ void GodfatherATC::adding(){
         }
         stringPtr = stringPtr -> next;
     }
-
+    checking();
     while(timeHead != NULL)
     {
-
         sorting(timeHead, timeHead->next);
         process(timeHead, timeHead->next);
-
-        cout << "wait a minute" << endl;
-        checking();
+        cout << "pass << " << endl;
     }
     wait();
     statistic();
@@ -423,6 +420,7 @@ void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
     ptr = ptr -> nextPlane -> nextPlane;
     if(ptr == NULL)
     {
+
         if(ptr1 ->nextTime == NULL)
         {
             timeUnit *lastTemp = timeHead;
@@ -431,8 +429,20 @@ void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
         }
         else
         {
-            cout << "pass" << endl;
-            ptr1 = ptr1 ->nextTime;
+            if(ptr1 ->nextTime ->timeSpace != (ptr1 ->timeSpace + 1))
+            {
+
+                timeUnit *tempPl = new timeUnit;
+                timeUnit *tmp = ptr1;
+                timeHead = tempPl;
+                tempPl -> prevTime = NULL;
+                tmp -> nextTime = NULL;
+                tempPl -> timeSpace = (ptr1 ->timeSpace + 1);
+                ptr1 = tempPl;
+                tempPl = NULL;
+                delete tempPl;
+                delete tmp;
+            }
         }
     }
     else
@@ -448,7 +458,6 @@ void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
         peopleSafeLanded += temp2 -> people;
         safeCargo += temp1 -> cargo;
         safeCargo += temp2 -> cargo;
-
         if(temp1 ->dOrA == 'A')
         {
             planeArrive++;
