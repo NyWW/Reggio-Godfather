@@ -67,7 +67,7 @@ public:
 
 
 private:
-    stringArray *head;
+    stringArray *stringHead;
     stringArray *stringPtr;
     stringArray *last;
 
@@ -101,7 +101,7 @@ private:
 
 };
 GodfatherATC::GodfatherATC(){
-    head = NULL;
+    stringHead = NULL;
     stringPtr = NULL;
     last = NULL;
 
@@ -136,8 +136,8 @@ void GodfatherATC::takingInput(){
     ifstream textfile;
     string sample;
     //textfile.open("FP.txt");
-    textfile.open("new.txt");
-    //textfile.open("AutomatedInput.txt");
+    //textfile.open("new.txt");
+    textfile.open("team2.txt");
     if(textfile.fail()){
         cerr << "Error Opening File!" << endl;
         exit(1);
@@ -153,20 +153,16 @@ void GodfatherATC::takingInput(){
         }
         sample = nospace;
         nospace = nospace.append(",");
-        /*textfile >> sample;
-         cout << sample << endl;
-         result += sample;
-         result.append(" ");
-         */
+
         wrongInput = checkInput(nospace);
         if(wrongInput == false)
         {
             stringArray *temp = new stringArray;
             temp -> inputs = sample;
-            if(head == NULL){
-                head = temp;
-                stringPtr = head;
-                last = head;
+            if(stringHead == NULL){
+                stringHead = temp;
+                stringPtr = stringHead;
+                last = stringHead;
             }
             else{
                 last -> next = temp;
@@ -186,7 +182,7 @@ void GodfatherATC::takingInput(){
     return;
 }
 void GodfatherATC::adding(){
-    stringPtr = head;
+    stringPtr = stringHead;
     //int test = 0;
     while(stringPtr != NULL){
         int cntForInput = 0;
@@ -198,7 +194,6 @@ void GodfatherATC::adding(){
             }
         }
         nospace.append(",");
-        //cout << ++test << endl;
         for(int i = 0; i < nospace.size(); i++)
             {
             if(nospace.at(i) == ','){
@@ -212,13 +207,11 @@ void GodfatherATC::adding(){
                     else if(nospace.at(inputLocation) == 'P')//P we call the function and break the loop so it does not fuck us up
                     {
                         statistic();
-                        //cout << "printed" << endl;
                         break;
                     }
                     else if(nospace.at(inputLocation) == 'W')//Same thing applies to W
                     {
                         wait();
-                        //cout << "waited" << endl;
                         break;
                     }
 
@@ -227,7 +220,7 @@ void GodfatherATC::adding(){
                 {
 
                     int tempInt = atof(nospace.substr(inputLocation,(i - inputLocation)).c_str());  //For convenience, we make a temp for the input.
-                    //cout << tempInt << "right now" << endl;
+
                     if(timeHead == NULL){               //you check if there exist a time unit already, if there is
                         timeUnit *temp = new timeUnit;  //creating a time unit
                         timeHead = temp;                //points the start of the time unit, does not change until we sort.
@@ -243,7 +236,7 @@ void GodfatherATC::adding(){
                         planePtr -> timeToExecute = tempInt;
                         inputLocation = i + 1;      //Do not forget to go to the next input segment
                         cntForInput++;              //Also, label the next input segment
-                        //cout <<"------------------" << endl;
+
                     }
                     else
                     {
@@ -254,6 +247,7 @@ void GodfatherATC::adding(){
                         }
                         if(timePtr -> timeSpace == tempInt)                 //if the time unit is equal, we don't need to create a new time node
                         {
+                            int until = timeHead ->timeSpace;
                             planePtr = timePtr -> next;
                             while(planePtr -> nextPlane != NULL)        //we go to the last plane node, however, I am not sure if we compare it as we go, but lets
                             {                                           //have this way for now
@@ -261,10 +255,16 @@ void GodfatherATC::adding(){
                             }
                             if(planePtr ->timeToExecute != tempInt)
                             {
+
                                 sorting(timeHead, timeHead ->next);
                                 process(timeHead, timeHead ->next);
-                                planePtr = timeHead ->next;
+                                planePtr = timeHead ->next;                            }
+                            while(until != tempInt && timeHead != NULL && timeHead ->timeSpace != tempInt)
+                            {
+                                process(timeHead, timeHead ->next);
+                                until++;
                             }
+                            planePtr = timeHead ->next;
                             while(planePtr -> nextPlane != NULL)        //we go to the last plane node, however, I am not sure if we compare it as we go, but lets
                             {                                           //have this way for now
                                 planePtr = planePtr -> nextPlane;
@@ -281,26 +281,75 @@ void GodfatherATC::adding(){
                         }
                         else if(timePtr -> timeSpace < tempInt)
                         {
+                            int until = timeHead -> timeSpace;
                             sorting(timeHead, timeHead ->next);
-                            process(timeHead, timeHead ->next);
-                            planePtr = timeHead -> next;
-                            while(planePtr -> nextPlane != NULL)        //we go to the last plane node, however, I am not sure if we compare it as we go, but lets
-                            {                                           //have this way for now
-                                planePtr = planePtr -> nextPlane;
+
+                            while(until != tempInt && timeHead != NULL )
+                            {
+                                process(timeHead, timeHead ->next);
+                                until++;
+
                             }
-                            Plane *temp = new Plane;
-                            planePtr -> nextPlane = temp;
-                            temp->prevPlane = planePtr;
-                            planePtr = planePtr -> nextPlane;
-                            temp = NULL;                                //No memory leak
-                            delete temp;
-                            planePtr -> timeToExecute = tempInt;
-                            inputLocation = i + 1;
-                            cntForInput++;
+                            if(timeHead != NULL && timeHead ->timeSpace > tempInt)
+                            {
+                                timeUnit *temp = new timeUnit;
+                                temp -> nextTime = timeHead;                     //I made the time struct this way because of this kind of situation
+                                temp -> timeSpace = tempInt;
+                                timeHead -> prevTime = temp;
+                                timePtr = temp;
+                                timeHead = temp;
+                                temp = NULL;
+                                delete temp;
+                                Plane *temp1 = new Plane;                       //Since this is a new time node, we do not need to check if there is planes under
+                                timePtr -> next = temp1;
+                                planePtr = temp1;
+                                temp1 = NULL;
+                                delete temp1;
+                                planePtr -> timeToExecute = tempInt;
+                                inputLocation = i + 1;
+                                cntForInput++;
+                            }
+                            else
+                            {
+
+                                if(timeHead!= NULL)
+                                {
+                                    planePtr = timeHead -> next;
+                                    while(planePtr -> nextPlane != NULL)        //we go to the last plane node, however, I am not sure if we compare it as we go, but lets
+                                    {                                           //have this way for now
+                                        planePtr = planePtr -> nextPlane;
+                                    }
+                                    Plane *temp = new Plane;
+                                    planePtr -> nextPlane = temp;
+                                    temp->prevPlane = planePtr;
+                                    planePtr = planePtr -> nextPlane;
+                                    temp = NULL;                                //No memory leak
+                                    delete temp;
+                                    planePtr -> timeToExecute = tempInt;
+                                    inputLocation = i + 1;
+                                    cntForInput++;
+                                }
+                                else
+                                {
+                                    timeUnit *temp = new timeUnit;  //creating a time unit
+                                    timeHead = temp;                //points the start of the time unit, does not change until we sort.
+                                    timePtr = temp;                 //this pointer moves around, gotta keep track of it
+                                    timePtr -> timeSpace = tempInt;     //set the time space value to the input
+                                    temp = NULL;
+                                    delete  temp;               //no memory leak
+                                    Plane *temp1 = new Plane;   //creating a plane for this input string
+                                    timePtr -> next = temp1;    //link the time unit to the first plane
+                                    planePtr = temp1;           //This pointer also moves around, so we need to make sure where it is.
+                                    temp1 = NULL;
+                                    delete temp1;               //no memory leak.
+                                    planePtr -> timeToExecute = tempInt;
+                                    inputLocation = i + 1;      //Do not forget to go to the next input segment
+                                    cntForInput++;              //Also, label the next input segment
+                                }
+                            }
                         }
                         else                                        //if the next time is larger than the time unit we want to add, that means we need to create a new time node
                         {
-
                             if(timePtr == timeHead){
                                 timeUnit *temp = new timeUnit;
                                 timeHead = temp;
@@ -397,26 +446,115 @@ void GodfatherATC::adding(){
                 }
             }
         }
+        checking();
         stringPtr = stringPtr -> next;
     }
 
     while(timeHead != NULL)
     {
-
         sorting(timeHead, timeHead->next);
         process(timeHead, timeHead->next);
-        //checking();
+
+
     }
 
-    cout << "awasd" << endl;
+    wait();
+    statistic();
+
 }
 
 void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
     Plane *temp1 = ptr;
     Plane *temp2 = ptr-> nextPlane;
-    ptr = ptr -> nextPlane -> nextPlane;
+    if(temp2 == NULL)
+    {
+        ptr = NULL;
+    }
+    else
+    {
+        ptr = ptr -> nextPlane -> nextPlane;
+    }
+
     if(ptr == NULL)
     {
+        if(temp2 == NULL)
+        {
+            numberOfPlanes += 1;
+            totalTime = ptr1 -> timeSpace;
+            relativeTime = ptr1 -> timeSpace;
+            peopleSafeLanded += temp1 -> people;
+            if(temp1 ->dOrA == 'A')
+            {
+                planeArrive++;
+                arriveWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            if(temp1 ->grandKid == true)
+            {
+                arriveGC++;
+                arriveGcwait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            }
+            }
+            else
+            {
+                if(temp1 ->grandKid == true)
+                {
+                departGC++;
+                departGCwait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+                }
+                planeDepart++;
+                departWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            }
+        }
+        else
+        {
+            numberOfPlanes += 2;
+            totalTime = ptr1 -> timeSpace;
+            relativeTime = ptr1 -> timeSpace;
+            peopleSafeLanded += temp1 -> people;
+            peopleSafeLanded += temp2 -> people;
+            safeCargo += temp1 -> cargo;
+            safeCargo += temp2 -> cargo;
+
+            if(temp1 ->dOrA == 'A')
+            {
+                planeArrive++;
+                arriveWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            if(temp1 ->grandKid == true)
+            {
+                arriveGC++;
+                arriveGcwait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            }
+            }
+            else
+            {
+                if(temp1 ->grandKid == true)
+                {
+                departGC++;
+                departGCwait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+                }
+                planeDepart++;
+                departWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            }
+            if(temp2 ->dOrA == 'A')
+            {
+                planeArrive++;
+                arriveWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            if(temp2 -> grandKid == true)
+            {
+                arriveGC++;
+                arriveGcwait += (ptr1 -> timeSpace) - (temp2 -> timeToExecute);
+            }
+            }
+            else
+            {
+            if(temp2 ->grandKid == true)
+            {
+                departGC++;
+                departGCwait += (ptr1 -> timeSpace) - (temp2 -> timeToExecute);
+            }
+                planeDepart++;
+                departWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
+            }
+        }
         if(ptr1 ->nextTime == NULL)
         {
             timeUnit *lastTemp = timeHead;
@@ -425,16 +563,16 @@ void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
         }
         else
         {
-            cout << "pass" << endl;
+            timeUnit *single = timeHead;
             ptr1 = ptr1 ->nextTime;
+            timeHead = ptr1;
+            timeHead ->prevTime = NULL;
+            single ->nextTime = NULL;
+            delete single;
         }
     }
     else
     {
-        ptr1 ->next = ptr;
-        ptr -> prevPlane = NULL;
-        temp2 -> nextPlane = NULL;
-
         numberOfPlanes += 2;
         totalTime = ptr1 -> timeSpace;
         relativeTime = ptr1 -> timeSpace;
@@ -483,26 +621,19 @@ void GodfatherATC::process(timeUnit *ptr1, Plane *ptr){
             planeDepart++;
             departWait += (ptr1 -> timeSpace) - (temp1 -> timeToExecute);
         }
-        //checking();
-        fuelDecrement(ptr1,ptr);
 
-        delete temp1;
+        ptr1 ->next = ptr;
+        ptr -> prevPlane = NULL;
+        temp2 -> nextPlane = NULL;
+        fuelDecrement(ptr1,ptr1->next);
+
         delete temp2;
+        delete temp1;
     }
-}
-int GodfatherATC::planeCounter(Plane *ptr) {
-        int indPlane = 0;
-        while(ptr != NULL)
-        {
-            ptr = ptr -> nextPlane;
-            indPlane++;
-        }
-    return indPlane;
 }
 void GodfatherATC::sorting(timeUnit *ptr1, Plane *ptr)
 {
     ptr1 -> next = mergeSort(ptr);
-
 }
 void GodfatherATC::wait(){
     avgTOWaitTime = (double)departWait / (double)planeDepart;
@@ -527,7 +658,7 @@ void GodfatherATC::statistic(){
 
 }
 void GodfatherATC::data(){
-    stringPtr = head;
+    stringPtr = stringHead;
     while(stringPtr != NULL){
         cout << stringPtr -> inputs << endl;
         stringPtr = stringPtr -> next;
@@ -540,7 +671,6 @@ void GodfatherATC::checking(){
 
     while(timePtr != NULL)
     {
-        sorting(timePtr, timePtr->next);
         cout << "At time " << timePtr -> timeSpace << endl;
         planePtr = timePtr -> next;
         while(planePtr != NULL)
@@ -565,8 +695,6 @@ void GodfatherATC::checking(){
 
         timePtr = timePtr -> nextTime;
     }
-
-
 }
 bool GodfatherATC::checkInput(string a){
     int cntForInput = 0;
@@ -579,7 +707,6 @@ bool GodfatherATC::checkInput(string a){
             {
                 if(i != 1)
                 {
-                    //cout << i << endl;
                     tempBool = true;
                 }
                 if(a.at(inputLocation) == 'D' || a.at(inputLocation) == 'P' || a.at(inputLocation) == 'W')
@@ -601,11 +728,7 @@ bool GodfatherATC::checkInput(string a){
             else if(cntForInput == 1)
             {
                 string tTime = "";
-                //cout << a << endl;
-                //cout << inputLocation << " " << i << endl;
-
                 tTime = a.substr(inputLocation, i - inputLocation);
-                //cout << tTime << endl;
                 for(int x = 0; x < tTime.size(); x++)
                 {
                     if(!isdigit(tTime.at(x)))
@@ -620,7 +743,6 @@ bool GodfatherATC::checkInput(string a){
             {
                 if(i != inputLocation + 1)
                 {
-                    //cout << i << endl;
                     tempBool = true;
                 }
                 if(a.at(inputLocation) == 'D' || a.at(inputLocation) == 'A')
@@ -638,11 +760,7 @@ bool GodfatherATC::checkInput(string a){
             else if(cntForInput == 3)
             {
                 string tFuel = "";
-                //cout << a << endl;
-                //cout << inputLocation << " " << i << endl;
-
                 tFuel = a.substr(inputLocation, i - inputLocation);
-                //cout << tFuel << endl;
                 for(int y = 0; y < tFuel.size(); y++)
                 {
                     if(!isdigit(tFuel.at(y)))
@@ -657,11 +775,7 @@ bool GodfatherATC::checkInput(string a){
             else if(cntForInput == 4)
             {
                 string tPeople = "";
-                //cout << a << endl;
-                //cout << inputLocation << " " << i << endl;
-
                 tPeople = a.substr(inputLocation, i - inputLocation);
-                //cout << tPeople << endl;
                 for(int y = 0; y < tPeople.size(); y++)
                 {
                     if(!isdigit(tPeople.at(y)))
@@ -677,11 +791,7 @@ bool GodfatherATC::checkInput(string a){
             {
                 string tCargo = "";
                 int pCounter = 0;
-                //cout << a << endl;
-                //cout << inputLocation << " " << i << endl;
-
                 tCargo = a.substr(inputLocation, i - inputLocation);
-                //cout << tCargo << endl;
                 for(int y = 0; y < tCargo.size(); y++)
                 {
                     if(!isdigit(tCargo.at(y)))
@@ -711,7 +821,6 @@ bool GodfatherATC::checkInput(string a){
             {
                 if(i != inputLocation + 1)
                 {
-                    //cout << i << endl;
                     tempBool = true;
                 }
                 if(a.at(inputLocation) == 'N' || a.at(inputLocation) == 'Y')
@@ -844,7 +953,6 @@ GodfatherATC::Plane* GodfatherATC::mergeSort(Plane *head)
 GodfatherATC::Plane* GodfatherATC::fuelDecrement(timeUnit *ptrT, Plane *ptr)
 {
     Plane *through = ptr;
-    Plane *headHere = ptr;
     while(through != NULL)
     {
         through -> currentFuel = through ->currentFuel - 1;
@@ -852,7 +960,11 @@ GodfatherATC::Plane* GodfatherATC::fuelDecrement(timeUnit *ptrT, Plane *ptr)
         {
             Plane *temp = through;
 
-            if(temp -> prevPlane == NULL)
+            if(temp ->nextPlane == NULL && temp ->prevPlane == NULL)
+            {
+                ptrT ->next = NULL;
+            }
+            else if(temp -> prevPlane == NULL)
             {
                 through = through -> nextPlane;
                 ptrT ->next = through;
@@ -888,9 +1000,13 @@ GodfatherATC::Plane* GodfatherATC::fuelDecrement(timeUnit *ptrT, Plane *ptr)
         }
         else if(through -> currentFuel < 20 && through ->dOrA == 'D')
         {
-            Plane *temp = new Plane;
-            temp = through;
-            if(temp -> prevPlane == NULL)
+            Plane *temp = through;
+
+            if(temp ->nextPlane == NULL && temp ->prevPlane == NULL)
+            {
+                ptrT ->next = NULL;
+            }
+            else if(temp -> prevPlane == NULL)
             {
                 through = through -> nextPlane;
                 timeHead ->next = through;
@@ -913,17 +1029,28 @@ GodfatherATC::Plane* GodfatherATC::fuelDecrement(timeUnit *ptrT, Plane *ptr)
                 temp -> nextPlane = NULL;
                 through = through ->prevPlane;
             }
-
             addDelayedPlane(ptrT,temp);
             temp = NULL;
             delete temp;
         }
-        else
-        {
-            through = through -> nextPlane;
-        }
+
+        through = through -> nextPlane;
+
     }
-    addToNext(timeHead,timeHead->next);
+    if(timeHead->next == NULL)
+    {
+        timeUnit *once = timeHead;
+        timeHead = timeHead ->nextTime;
+        timeHead ->prevTime->nextTime = NULL;
+        timeHead ->prevTime = NULL;
+
+        delete once;
+    }
+    else
+    {
+        addToNext(timeHead,timeHead->next);
+    }
+
 
 }
 void GodfatherATC::addDelayedPlane(timeUnit *ptrT,Plane *ptr)
@@ -934,7 +1061,6 @@ void GodfatherATC::addDelayedPlane(timeUnit *ptrT,Plane *ptr)
     temp = timeHead;                                 //Make sure the pointer starts at the beginning of the time list so we can proceed.
     while((temp -> timeSpace) < tempInt && temp -> nextTime != NULL)             //Check if the time unit is bigger or equal, if not, move to the next time unit
     {
-        //cout << timePtr -> timeSpace << endl;
         temp = temp -> nextTime;
 
     }
@@ -966,13 +1092,11 @@ void GodfatherATC::addDelayedPlane(timeUnit *ptrT,Plane *ptr)
     {
         timeUnit *tempTi = new timeUnit;
         if(temp == timeHead){
-            timeHead = tempTi;
             tempTi -> nextTime = temp;                     //I made the time struct this way because of this kind of situation
             tempTi -> timeSpace = tempInt;
             temp -> prevTime = tempTi;
             temp = tempTi;
             tempTi = NULL;
-
             delete tempTi;                    //Since this is a new time node, we do not need to check if there is planes under
             temp -> next = ptr;
         }
@@ -996,6 +1120,7 @@ void GodfatherATC::addToNext(timeUnit *ptrT, Plane *ptr)
     timeUnit *temp;
     int tempInt = ptrT ->timeSpace + 1;
     temp = timeHead;                                 //Make sure the pointer starts at the beginning of the time list so we can proceed.
+
     while((temp -> timeSpace) < tempInt && temp -> nextTime != NULL)             //Check if the time unit is bigger or equal, if not, move to the next time unit
     {
         temp = temp -> nextTime;
@@ -1021,23 +1146,23 @@ void GodfatherATC::addToNext(timeUnit *ptrT, Plane *ptr)
     {
         timeUnit *tempPl = new timeUnit;
         timeUnit *tmp = temp;
-        timeHead = tempPl;
-        tempPl -> prevTime = NULL;
         temp -> nextTime = NULL;
         tempPl -> timeSpace = tempInt;
         temp = tempPl;
+        timeHead = temp;
         tempPl = NULL;
         delete tempPl;
         delete tmp;
+
         temp -> next = ptr;
     }
     else                                        //if the next time is larger than the time unit we want to add, that means we need to create a new time node
     {
-        timeUnit *tempTi = new timeUnit;
+
         if(temp == timeHead){
+            timeUnit *tempTi = new timeUnit;
             timeHead = tempTi;
             tempTi -> nextTime = temp ->nextTime;                     //I made the time struct this way because of this kind of situation
-            temp ->nextTime ->prevTime = tempTi;
             tempTi -> timeSpace = tempInt;
             timeUnit *tmp = temp;
             temp = tempTi;
@@ -1050,6 +1175,7 @@ void GodfatherATC::addToNext(timeUnit *ptrT, Plane *ptr)
         }
         else
         {
+            timeUnit *tempTi = new timeUnit;
             timeHead = tempTi;
             tempTi ->next = ptr;
             timeUnit *tmp = temp ->prevTime;
@@ -1065,7 +1191,6 @@ void GodfatherATC::addToNext(timeUnit *ptrT, Plane *ptr)
     }
     temp = NULL;
     delete temp;
-
 }
 int main(){
     GodfatherATC Sherloc;
